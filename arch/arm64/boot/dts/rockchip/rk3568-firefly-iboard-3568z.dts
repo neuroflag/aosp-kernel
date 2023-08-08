@@ -1,0 +1,30 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright (c) 2020 Rockchip Electronics Co., Ltd.
+ *
+ */
+
+/dts-v1/;
+
+#include "rk3568-firefly-iboard-3568z.dtsi"
+#include "rk3568-firefly-iboard-3568z-ext.dtsi"
+
+/*
+ * Select one of the three 
+ * using single camera xc7160 ----> rk3568-firefly-iboard-3568z-cam-8ms1m.dtsi
+ * using dual camera gc2053/gc2093   ----> rk3568-firefly-iboard-3568z-cam-2ms2m.dtsi
+ * using hdmi-in module rk628d   ----> rk3568-firefly-iboard-3568z-tf-hdmi-mipi-rk628.dtsi
+ */
+#include "rk3568-firefly-iboard-3568z-cam-8ms1m.dtsi"
+//#include "rk3568-firefly-iboard-3568z-cam-2ms2m.dtsi"
+//#include "rk3568-firefly-iboard-3568z-tf-hdmi-mipi-rk628.dtsi"
+
+/ {
+    model = "IBOARD-3568Z HDMI (Android)";
+    compatible = "rockchip,rk3568-firefly-iboard-3568z", "rockchip,rk3568";
+};
+
+&route_hdmi {
+    status = "okay";
+    connect = <&vp0_out_hdmi>;
+};

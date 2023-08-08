@@ -1,0 +1,102 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright (c) 2020 Rockchip Electronics Co., Ltd.
+ *
+ */
+
+ /dts-v1/;
+
+#include "rk3566-roc-pc-hdmi2csi-rk628d.dtsi"
+#include "rk628.dtsi"
+
+/ {
+    model = "ROC-RK3566-PC HDMI(Android)";
+    compatible = "rockchip,rk3566-roc-pc", "rockchip,rk3566";
+};
+&rk628_combrxphy {
+	status = "okay";
+};
+
+&rk628_combtxphy {
+	status = "okay";
+};
+
+&rk628_csi {
+	status = "okay";
+	/*
+	 * If the hpd output level is inverted on the circuit,
+	 * the following configuration needs to be enabled.
+	 */
+    //hpd-output-inverted;
+	plugin-det-gpios = <&gpio4 RK_PC1 GPIO_ACTIVE_LOW>;
+	//power-gpios = <&gpio0 17 GPIO_ACTIVE_HIGH>;
+	rockchip,camera-module-index = <0>;
+	rockchip,camera-module-facing = "back";
+	rockchip,camera-module-name = "RK628-CSI";
+	rockchip,camera-module-lens-name = "NC";
+
+	port {
+		hdmi_in0: endpoint {
+			remote-endpoint = <&mipi_in_ucam0>;
+			data-lanes = <1 2 3 4>;
+		};
+	};
+};
+
+&csi2_dphy0 {
+	status = "disabled";
+	/*
+	* dphy0 only used for full mode,
+	* full mode and split mode are mutually exclusive
+	*/
+	ports {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		port@0 {
+			reg = <0>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			mipi_in_ucam0: endpoint@1 {
+				reg = <1>;
+				remote-endpoint = <&hdmi_in0>;
+				data-lanes = <1 2 3 4>;
+			};
+		};
+
+	};
+};
+
+/*
+ * csi2_dphy0: used for csi2 dphy full mode,
+               is mutually exclusive with
+               csi2_dphy1 and csi2_dphy2
+ * csi2_dphy1: used for csi2 dphy split mode,
+               physical lanes use lane0 and lane1,
+               can be used with csi2_dphy2  parallel
+ * csi2_dphy2: used for csi2 dphy split mode,
+               physical lanes use lane2 and lane3,
+               can be used with csi2_dphy1  parallel
+ */
+&csi2_dphy0 {
+        status = "okay";
+};
+&csi2_dphy1 {
+        status = "disabled";
+};
+&csi2_dphy2 {
+        status = "disabled";
+};
+
+/*
+ * csidphy_out ----> csi2_dphy0
+ * dphy1_out   ----> csi2_dphy1
+ * dphy2_out   ----> csi2_dphy2
+ */
+
+&isp0_in {
+        remote-endpoint = <&csidphy_out>;
+};
+&rkisp_mmu{
+    status = "okay";
+};

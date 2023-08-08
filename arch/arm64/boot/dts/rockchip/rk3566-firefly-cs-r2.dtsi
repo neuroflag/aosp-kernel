@@ -1,0 +1,171 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright (c) 2020 Rockchip Electronics Co., Ltd.
+ *
+ */
+
+#include "rk3568-firefly-port.dtsi"
+#include "rk3566-diff.dtsi"
+
+/ {
+    firefly_leds: leds {
+       compatible = "gpio-leds";
+       power_led: power {
+           label = "firefly:blue:power";
+           linux,default-trigger = "ir-power-click";
+           default-state = "on";
+           gpios = <&gpio4 RK_PB6 GPIO_ACTIVE_HIGH>;
+           pinctrl-names = "default";
+           pinctrl-0 = <&led_power>;
+       };
+
+       user_led: user {
+           label = "firefly:yellow:user";
+           linux,default-trigger = "ir-user-click";
+           default-state = "off";
+           gpios = <&gpio4 RK_PB0 GPIO_ACTIVE_HIGH>;
+           pinctrl-names = "default";
+           pinctrl-0 = <&led_user>;
+       };
+   };
+
+    ds18b20 {
+        status = "okay";
+        compatible = "firefly,ds1820";
+        ds1820-dq = <&gpio4 2 GPIO_ACTIVE_LOW>; //new R2 version
+        ds1820-dq-1 = <&gpio0 19 GPIO_ACTIVE_LOW>; // old R2 version
+    }; 
+
+    ntc {
+        compatible = "firefly,ncu18wf103f6srb";
+        pullup-uv = <1800000>;
+        pullup-ohm = <10000>;
+        pulldown-ohm = <0>;
+        io-channels = <&saradc 3>;
+    };
+
+    wdt_pwr: wdt-pwr-regulator {
+        compatible = "regulator-fixed";
+        enable-active-high;
+        regulator-always-on;
+        regulator-boot-on;
+        pinctrl-names = "default";
+        pinctrl-0 = <&wdt_pwr_drv>;
+        regulator-name = "wdt_pwr";
+    };
+    sub_position {
+        status = "okay";
+        compatible = "firefly,sub_position";
+        core-add-0 = <&gpio4 18 GPIO_ACTIVE_HIGH>;
+        core-add-1 = <&gpio4 19 GPIO_ACTIVE_HIGH>;
+        core-add-2 = <&gpio4 22 GPIO_ACTIVE_HIGH>;
+        core-add-3 = <&gpio4 21 GPIO_ACTIVE_HIGH>;
+    }; 
+
+    core_mb_sys_en: core-mb-sys-en-regulator {
+        compatible = "regulator-fixed";
+        enable-active-high;
+        regulator-always-on;
+        regulator-boot-on;
+        pinctrl-names = "default";
+        gpio = <&gpio0 RK_PC5 GPIO_ACTIVE_HIGH>;
+        pinctrl-0 = <&core_mb_sys_en_drv>;
+        regulator-name = "core_mb_sys_en";
+    };
+};
+
+&uart1 {
+    pinctrl-names = "default";
+    pinctrl-0 = <&uart1m0_xfer &uart1m0_ctsn>;
+    status = "okay";
+};
+
+&pcie2x1 {
+    status = "disabled";
+};
+
+&sata2 {
+    status = "okay";
+};
+
+&its {
+    status = "okay";
+};
+
+&pinctrl {
+    leds {
+         led_power: led-power {
+             rockchip,pins = <4 RK_PB6 RK_FUNC_GPIO &pcfg_pull_none>;
+         };
+
+         led_user: led-user {
+             rockchip,pins = <4 RK_PB0 RK_FUNC_GPIO &pcfg_pull_none>;
+         };
+    };
+    wdt-pwr {
+        wdt_pwr_drv: wdt-pwr-drv {
+            rockchip,pins = <3 1 RK_FUNC_GPIO &pcfg_pull_none>;
+        };
+    };
+    core-mb-sys-en {
+        core_mb_sys_en_drv: core-mb-sys-en-drv {
+            rockchip,pins = <0 RK_PC5 RK_FUNC_GPIO &pcfg_pull_up>;
+        };
+    };
+};
+
+&gmac1 {
+    phy-mode = "rgmii";
+    clock_in_out = "input";
+
+    snps,reset-gpio = <&gpio0 RK_PB7 GPIO_ACTIVE_LOW>;
+    snps,reset-active-low;
+    /* Reset time is 20ms, 100ms for rtl8211f */
+    snps,reset-delays-us = <0 20000 100000>;
+
+    assigned-clocks = <&cru SCLK_GMAC1_RX_TX>, <&cru SCLK_GMAC1>;
+    assigned-clock-parents = <&cru SCLK_GMAC1_RGMII_SPEED>, <&gmac1_clkin>;
+
+    pinctrl-names = "default";
+    pinctrl-0 = <&gmac1m0_miim
+             &gmac1m0_tx_bus2
+             &gmac1m0_rx_bus2
+             &gmac1m0_rgmii_clk
+             &gmac1m0_rgmii_bus
+             &gmac1m0_clkinout>;
+
+    tx_delay = <0x48>;
+    rx_delay = <0x2e>;
+
+    phy-handle = <&rgmii_phy1>;
+    status = "okay";
+};
+
+// for cs_r2 nor flash
+&sfc{
+ rk3566-fspi-two-line;
+ status = "okay";
+};
+
+&i2c2{
+    status = "okay";
+    pinctrl-0 = <&i2c2m1_xfer>;
+    sensor@3c{
+        status = "okay";
+        compatible = "firefly,pc9202";
+        reg = <0x3c>;
+        wd-en-gpio = <&gpio4 17 GPIO_ACTIVE_HIGH>;
+    };
+};
+
+//for recovery key in cs_r2
+&adc_keys {
+    recovery-key {
+        keyvalue-low = <0>;
+        keyvalue-high = <200>;
+    };
+};
+
+&vcc3v3_lcd1_n {
+ /delete-property/ gpio;
+};

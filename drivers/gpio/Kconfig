@@ -438,6 +438,14 @@ config GPIO_REG
 	  A 32-bit single register GPIO fixed in/out implementation.  This
 	  can be used to represent any register as a set of GPIO signals.
 
+config GPIO_ROCKCHIP
+	tristate "Rockchip GPIO support"
+	depends on ARCH_ROCKCHIP || COMPILE_TEST
+	select GPIOLIB_IRQCHIP
+	default ARCH_ROCKCHIP
+	help
+	  Say yes here to support GPIO on Rockchip SoCs.
+
 config GPIO_SPEAR_SPICS
 	bool "ST SPEAr13xx SPI Chip Select as GPIO support"
 	depends on PLAT_SPEAR
@@ -1372,6 +1380,12 @@ config GPIO_XRA1403
 
 endmenu
 
+config GPIO_FIREFLY
+    tristate "Firefly GPIO Demo support"
+    default y
+    help
+        Sample code of gpio
+
 menu "USB GPIO expanders"
 	depends on USB
 
@@ -1385,6 +1399,13 @@ config GPIO_VIPERBOARD
           See viperboard API specification and Nano
           River Tech's viperboard.h for detailed meaning
           of the module parameters.
+
+config GPIO_SUB_POSITION
+	tristate "Firefly GPIO SUB position driver support"
+	default y
+	help
+	  Sample code of Cluster_Server_R2 sub position .
+
 
 endmenu
 

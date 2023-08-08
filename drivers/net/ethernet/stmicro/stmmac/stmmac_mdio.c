@@ -303,6 +303,7 @@ int stmmac_mdio_reset(struct mii_bus *bus)
 	return 0;
 }
 
+extern int rtl8211fd_soft_reset(struct phy_device *phydev);
 /**
  * stmmac_mdio_register
  * @ndev: net device structure
@@ -363,6 +364,23 @@ int stmmac_mdio_register(struct net_device *ndev)
 	if (err != 0) {
 		dev_err(dev, "Cannot register the MDIO bus\n");
 		goto bus_register_fail;
+	}
+
+	/*
+	 * RTL8211FD-VX REGISTER PATCH Condition:
+	 * If you can do a Hardware Reset: After SoC/MAC is ready, issue a hardware reset to PHY,
+	 * wait RT5 time of power on sequence, and then start patching it within 55ms ~ 500ms.
+	 */
+	if (new_bus) {
+		struct phy_device *phydev_realtek = mdiobus_get_phy(new_bus, addr);
+		if (phydev_realtek) {
+			if(phydev_realtek->drv){
+				if (0x001cc859 == phydev_realtek->drv->phy_id) {
+					dev_warn(dev, "Found the PHY of RTL8211FD-VX and will patch it\n");
+					rtl8211fd_soft_reset(phydev_realtek);
+				}
+			}
+		}
 	}
 
 	if (priv->plat->phy_node || mdio_node)

@@ -48,6 +48,10 @@ modules.builtin
 #
 # Top-level generic files
 #
+/boot.img
+/kernel.img
+/resource.img
+/zboot.img
 /tags
 /TAGS
 /linux
@@ -85,6 +89,7 @@ modules.builtin
 !.mailmap
 !.cocciconfig
 !.clang-format
+!arch/arm64/boot/dts/rockchip/.*.domain
 
 #
 # Generated include files

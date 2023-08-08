@@ -7,6 +7,9 @@ config FB_CMDLINE
 
 config FB_NOTIFY
 	bool
+config FB_FIREFLY
+	bool
+	default y
 
 config FB_CLPS711X_OLD
 	tristate

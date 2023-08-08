@@ -927,6 +927,12 @@ UNUSUAL_DEV(  0x05e3, 0x0723, 0x9451, 0x9451,
 		USB_SC_DEVICE, USB_PR_DEVICE, NULL,
 		US_FL_SANE_SENSE ),
 
+UNUSUAL_DEV(  0x05e3, 0x0749, 0x0000, 0xffff,
+		"Genesys Logic",
+		"USB Storage",
+		USB_SC_DEVICE, USB_PR_DEVICE, NULL,
+		US_FL_GO_SLOW | US_FL_MAX_SECTORS_64 | US_FL_IGNORE_RESIDUE ),
+
 /*
  * Reported by Hanno Boeck <hanno@gmx.de>
  * Taken from the Lycoris Kernel
@@ -1274,6 +1280,12 @@ UNUSUAL_DEV( 0x090a, 0x1200, 0x0000, 0x9999,
 		"MP3 player",
 		USB_SC_RBC, USB_PR_BULK, NULL,
 		0 ),
+
+UNUSUAL_DEV(0x0951, 0x1666, 0x1100, 0x1100,
+		"Kingston",
+		"Flash Drive FIT",
+		USB_SC_DEVICE, USB_PR_DEVICE, NULL,
+		US_FL_MAX_SECTORS_64),
 
 UNUSUAL_DEV(0x090c, 0x1000, 0x1100, 0x1100,
 		"Samsung",

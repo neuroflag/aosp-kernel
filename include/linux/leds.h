@@ -472,4 +472,6 @@ static inline void led_classdev_notify_brightness_hw_changed(
 	struct led_classdev *led_cdev, enum led_brightness brightness) { }
 #endif
 
+extern  struct led_trigger *firefly_power_click;
+
 #endif		/* __LINUX_LEDS_H_INCLUDED */

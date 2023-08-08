@@ -219,6 +219,67 @@ out:
 	raw_spin_unlock_irqrestore(&devtree_lock, flags);
 }
 
+static void dto_overide(void)
+{
+	struct device_node * nd = NULL;
+	struct property * root_prop = NULL;
+	struct property * dto_prop = NULL;
+	struct property * new_model = NULL;
+	struct property * new_compatible = NULL;
+
+	if (!of_root)
+		return;
+
+	mutex_lock(&of_mutex);
+	for (nd = of_root; nd; nd = of_find_all_nodes(nd)) {
+		if (nd->name) {
+			if (!strcmp(nd->name, "dto"))
+				break;
+		}
+	}
+	mutex_unlock(&of_mutex);
+
+	if (!nd) {
+		printk("dto_overide: not find dto node\n");
+		return;
+	}
+
+	root_prop = of_find_property(of_root, "model", NULL);
+	dto_prop = of_find_property(nd, "model", NULL);
+	if (root_prop == NULL || dto_prop == NULL) {
+		printk("dto_overide: Unable to find model property for root or dto\n");
+		return;
+	}
+
+	new_model = kzalloc(sizeof(struct property), GFP_KERNEL);
+	if (!new_model) {
+		printk("dto_overide: new_model kzalloc fail\n");
+		return;
+	}
+	memcpy(new_model, root_prop, sizeof(*root_prop));
+	new_model->length = dto_prop->length;
+	new_model->value = dto_prop->value;
+	of_update_property(of_root, new_model);
+
+	
+	root_prop = of_find_property(of_root, "compatible", NULL);
+	dto_prop = of_find_property(nd, "compatible", NULL);
+	if (root_prop == NULL || dto_prop == NULL) {
+		printk("dto_overide: Unable to find compatible property for root or dto\n");
+		return;
+	}
+	
+	new_compatible = kzalloc(sizeof(struct property), GFP_KERNEL);
+	if (!new_compatible) {
+		printk("dto_overide: new_compatible kzalloc fail\n");
+		return;
+	}
+	memcpy(new_compatible, root_prop, sizeof(*root_prop));
+	new_compatible->length = dto_prop->length;
+	new_compatible->value = dto_prop->value;
+	of_update_property(of_root, new_compatible);
+}
+
 void __init of_core_init(void)
 {
 	struct device_node *np;
@@ -236,6 +297,9 @@ void __init of_core_init(void)
 	for_each_of_allnodes(np)
 		__of_attach_node_sysfs(np);
 	mutex_unlock(&of_mutex);
+	
+	/* Override Model and compatible for the root node according to the DTO node */
+	dto_overide();
 
 	/* Symlink in /proc as required by userspace ABI */
 	if (of_root)

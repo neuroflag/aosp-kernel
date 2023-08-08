@@ -1,0 +1,115 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright (c) 2020 Rockchip Electronics Co., Ltd.
+ *
+ */
+
+/* 2M  dual camera gc2053(IR)/gc2093(RGB) */
+
+/*
+* csi2_dphy0: used for csi2 dphy full mode,
+        is mutually exclusive with
+        csi2_dphy1 and csi2_dphy2
+* csi2_dphy1: used for csi2 dphy split mode,
+        physical lanes use lane0 and lane1,
+        can be used with csi2_dphy2  parallel
+* csi2_dphy2: used for csi2 dphy split mode,
+        physical lanes use lane2 and lane3,
+        can be used with csi2_dphy1  parallel
+*/
+
+&csi2_dphy0 {
+    status = "disabled";
+};
+
+&csi2_dphy1 {
+    status = "okay";
+};
+
+
+&csi2_dphy2 {
+    status = "okay";
+};
+
+&mipi_csi2 {
+    status = "okay";
+};
+
+&rkisp_vir1 {
+    status = "okay";
+};
+
+&mipi_csi2 {
+    status = "okay";
+};
+
+&rkcif_mipi_lvds {
+    status = "okay";
+};
+
+&rkcif_mipi_lvds_sditf {
+    status = "okay";
+};
+
+&rkcif_mmu {
+    status = "okay";
+};
+
+&rkcif {
+    status = "okay";
+};
+
+&rkisp {
+    status = "okay";
+};
+
+&rkisp_mmu {
+    status = "okay";
+};
+
+/*
+ * csidphy_out ----> csi2_dphy0
+ * dphy1_out   ----> csi2_dphy1
+ * dphy2_out   ----> csi2_dphy2
+ */
+&isp0_in {
+    remote-endpoint = <&dphy1_out>;
+};
+
+&i2c4 {
+	status = "okay";
+        gc2053: gc2053@37 { //IR
+        	status = "okay";
+		clocks = <&cru CLK_CIF_OUT>;
+                pinctrl-names = "default";
+                pinctrl-0 = <&cif_clk>;
+                power-gpios = <&gpio3 RK_PD5 GPIO_ACTIVE_HIGH>;//IR_PWR_EN
+                pwdn-gpios = <&gpio4 RK_PB1 GPIO_ACTIVE_LOW>;
+        };
+
+        gc2093: gc2093b@7e{ //RGB
+        	status = "okay";
+                clock-names = "xvclk";
+                pinctrl-names = "default";
+                pwdn-gpios = <&gpio3 RK_PD4 GPIO_ACTIVE_HIGH>;
+        };
+
+};
+&vcc_camera {
+	status = "okay";
+	gpio = <&gpio4 RK_PA4 GPIO_ACTIVE_HIGH>;
+};
+
+&flash_led {
+	status = "okay";
+	label = "gpio-flash-led";
+	enable-gpio = <&gpio4 RK_PA7 GPIO_ACTIVE_HIGH>;
+	/delete-node/ pwms;
+};
+&pinctrl {
+        cam {
+                vcc_cam: vcc-cam {
+                        rockchip,pins = <4 RK_PA4 RK_FUNC_GPIO &pcfg_pull_none>;
+                };
+        };
+};

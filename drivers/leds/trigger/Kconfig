@@ -18,6 +18,13 @@ config LEDS_TRIGGER_TIMER
 
 	  If unsure, say Y.
 
+config LEDS_FIREFLY_DEMO
+    tristate "Firefly LED Demo support"
+    default y
+    help
+      This allows LEDs to be initialised in the ON state.
+
+
 config LEDS_TRIGGER_ONESHOT
 	tristate "LED One-shot Trigger"
 	help

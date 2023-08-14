@@ -132,3 +132,11 @@ all.config
 
 # Kdevelop4
 *.kdev4
+
+#
+# Neuroflag
+#
+/configs
+/prebuilts
+/tests
+!drivers/input/touchscreen/hxchipset/Himax_firmware.bin
